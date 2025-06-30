@@ -1,9 +1,19 @@
+using EndpointFiltersExample.Accessor;
+using EndpointFiltersExample.Filters;
+using EndpointFiltersExample.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var services = builder.Services;
+services.AddSingleton<AuthContextAccessor>();
+
+
+
 
 var app = builder.Build();
 
@@ -21,6 +31,8 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
+app.UseMiddleware<AuthExtractionMiddleware>();
+
 app.MapGet("/weatherforecast", () =>
     {
         var forecast = Enumerable.Range(1, 5).Select(index =>
@@ -33,6 +45,9 @@ app.MapGet("/weatherforecast", () =>
             .ToArray();
         return forecast;
     })
+    .AddEndpointFilter<InternalViewEndpointFilter>()
+    .AddEndpointFilter<SuperAdminEndpointFilter>()
+    .AddEndpointFilter<AuthResultFilter>()
     .WithName("GetWeatherForecast")
     .WithOpenApi();
 

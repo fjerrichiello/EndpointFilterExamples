@@ -1,6 +1,7 @@
 @EndpointFiltersExample_HostAddress = http://localhost:5215
 
 GET {{EndpointFiltersExample_HostAddress}}/weatherforecast/
+CustomAuthorization: "TestUser"
 Accept: application/json
 
 ###
