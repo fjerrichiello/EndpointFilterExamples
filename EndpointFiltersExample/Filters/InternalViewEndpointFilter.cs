@@ -2,18 +2,11 @@
 
 namespace EndpointFiltersExample.Filters;
 
-public class InternalViewEndpointFilter(AuthContextAccessor _authContextAccessor) : IEndpointFilter
+public class InternalViewEndpointFilter(AuthContextAccessor _authContextAccessor)
+    : BaseEndpointAuthorizationFilter(_authContextAccessor)
 {
-    public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context,
-        EndpointFilterDelegate next)
+    protected override Task<bool> AuthorizeAsync()
     {
-        Console.WriteLine("Internal view endpoint");
-        if (_authContextAccessor.Data != "InternalView")
-        {
-            _authContextAccessor.RequestAuthorized.Add(false);
-        }
-
-        var result = await next(context);
-        return result;
+        return Task.FromResult(_authContextAccessor.Data == "InternalView");
     }
 }
