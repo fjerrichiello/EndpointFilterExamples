@@ -8,13 +8,13 @@ public abstract class BaseEndpointAuthorizationFilter(AuthContextAccessor _authC
         EndpointFilterDelegate next)
     {
         Console.WriteLine("Auth result view endpoint");
-        
-        var authorizationCheck = await AuthorizeAsync();
+
+        var authorizationCheck = await AuthorizeAsync(context);
         _authContextAccessor.RequestAuthorized.Add(authorizationCheck);
 
         var result = await next(context);
         return result;
     }
 
-    protected abstract Task<bool> AuthorizeAsync();
+    protected abstract Task<bool> AuthorizeAsync(EndpointFilterInvocationContext context);
 }
