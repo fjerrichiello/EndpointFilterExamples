@@ -1,6 +1,9 @@
+using EndpointFiltersExample;
 using EndpointFiltersExample.Accessor;
+using EndpointFiltersExample.DataFactory;
 using EndpointFiltersExample.Filters;
 using EndpointFiltersExample.Middleware;
+using EndpointFiltersExample.Verifier;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +15,8 @@ builder.Services.AddSwaggerGen();
 var services = builder.Services;
 services.AddSingleton<AuthContextAccessor>();
 
-
-
+services.AddScoped<IAuthorizedRequestVerifier<NewData>, NewDataVerifier>();
+services.AddScoped<IRequestDataFactory<NewData>, NewDataFactory>();
 
 var app = builder.Build();
 
@@ -45,15 +48,16 @@ app.MapGet("/weatherforecast", () =>
             .ToArray();
         return forecast;
     })
-    .AddEndpointFilter<InternalViewEndpointFilter>()
-    .AddEndpointFilter<SuperAdminEndpointFilter>()
-    .AddEndpointFilter<AuthResultFilter>()
+    .AddEndpointFilter<EndpointAuthorizationFilter<NewData>>()
     .WithName("GetWeatherForecast")
     .WithOpenApi();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+namespace EndpointFiltersExample
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+    {
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
 }
