@@ -4,6 +4,7 @@ using EndpointFiltersExample.DataFactory;
 using EndpointFiltersExample.Filters;
 using EndpointFiltersExample.Middleware;
 using EndpointFiltersExample.Verifier;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +37,7 @@ var summaries = new[]
 
 app.UseMiddleware<AuthExtractionMiddleware>();
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/weatherforecast/{member_id}", ([FromRoute(Name = "member_id")] string memberId) =>
     {
         var forecast = Enumerable.Range(1, 5).Select(index =>
                 new WeatherForecast
@@ -49,7 +50,24 @@ app.MapGet("/weatherforecast", () =>
         return forecast;
     })
     .AddEndpointFilter<EndpointAuthorizationFilter<NewData>>()
-    .WithName("GetWeatherForecast")
+    .WithName("GetWeatherForecast1")
+    .WithOpenApi();
+
+
+app.MapGet("/weatherforecast", ([FromQuery(Name = "member_ids")] string[] memberIds) =>
+    {
+        var forecast = Enumerable.Range(1, 5).Select(index =>
+                new WeatherForecast
+                (
+                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                    Random.Shared.Next(-20, 55),
+                    summaries[Random.Shared.Next(summaries.Length)]
+                ))
+            .ToArray();
+        return forecast;
+    })
+    .AddEndpointFilter<EndpointAuthorizationFilter<NewData>>()
+    .WithName("GetWeatherForecast2")
     .WithOpenApi();
 
 app.Run();

@@ -1,7 +1,10 @@
 @EndpointFiltersExample_HostAddress = http://localhost:5215
 
-GET {{EndpointFiltersExample_HostAddress}}/weatherforecast/
+GET {{EndpointFiltersExample_HostAddress}}/weatherforecast?member_ids=12&member_ids=13
 CustomAuthorization: "TestUser"
 Accept: application/json
 
 ###
+GET {{EndpointFiltersExample_HostAddress}}/weatherforecast/12
+CustomAuthorization: "TestUser"
+Accept: application/json
